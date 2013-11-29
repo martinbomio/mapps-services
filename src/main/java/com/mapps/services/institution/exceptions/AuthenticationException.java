@@ -7,5 +7,5 @@ package com.mapps.services.institution.exceptions;
  * Time: 11:37 AM
  * To change this template use File | Settings | File Templates.
  */
-public class InvalidTokenException extends Exception {
+public class AuthenticationException extends Exception {
 }
