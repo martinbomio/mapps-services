@@ -16,7 +16,7 @@
     </dependency>
     <dependency>
       <groupId>authenticationhandler</groupId>
-      <artifactId>autenticationhandler</artifactId>
+      <artifactId>authenticationhandler</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
     <dependency>

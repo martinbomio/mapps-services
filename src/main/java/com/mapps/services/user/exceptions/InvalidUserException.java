@@ -4,5 +4,5 @@ package com.mapps.services.user.exceptions;
  *
  *
  */
-public class CouldNotUpdateUserException extends Exception {
+public class InvalidUserException extends Exception {
 }

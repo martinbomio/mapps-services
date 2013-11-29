@@ -1,13 +1,16 @@
 package com.mapps.services.user;
 
 
+import javax.ejb.Local;
+
 import com.mapps.model.User;
 import com.mapps.services.user.exceptions.AuthenticationException;
-import com.mapps.services.user.exceptions.CouldNotUpdateUserException;
+import com.mapps.services.user.exceptions.InvalidUserException;
 
 /**
  * Defines the services for handling user interactions with the system.
  */
+@Local
 public interface UserService {
     /**
      * Authentificates a user of the system to interact with the system
@@ -28,7 +31,7 @@ public interface UserService {
      *Updates the information of a user
      * @param user new user information
      * @param token indentifier of the ssesion
-     * @throws CouldNotUpdateUserException if the user could not be updated.
+     * @throws com.mapps.services.user.exceptions.InvalidUserException if the user could not be updated.
      */
-    void updateUser(User user, String token) throws CouldNotUpdateUserException;
+    void updateUser(User user, String token) throws InvalidUserException, AuthenticationException;
 }

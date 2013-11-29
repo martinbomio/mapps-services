@@ -6,11 +6,13 @@ import javax.ejb.Stateless;
 import org.apache.log4j.Logger;
 
 import com.mapps.authentificationhandler.AuthenticationHandler;
-import com.mapps.authentificationhandler.exceptions.InvalidUserException;
+import com.mapps.authentificationhandler.exceptions.InvalidTokenException;
+import com.mapps.exceptions.UserNotFoundException;
 import com.mapps.model.User;
+import com.mapps.persistence.UserDAO;
 import com.mapps.services.user.UserService;
 import com.mapps.services.user.exceptions.AuthenticationException;
-import com.mapps.services.user.exceptions.CouldNotUpdateUserException;
+import com.mapps.services.user.exceptions.InvalidUserException;
 
 /**
  * An implementation of the UserService.
@@ -19,8 +21,10 @@ import com.mapps.services.user.exceptions.CouldNotUpdateUserException;
 public class UserServiceImpl implements UserService{
     Logger logger = Logger.getLogger(UserServiceImpl.class);
 
-    @EJB(name = "AuthenticationHandler")
+    @EJB(beanName = "AuthenticationHandler")
     AuthenticationHandler authenticationHandler;
+    @EJB(beanName = "UserDAO")
+    UserDAO userDAO;
 
     @Override
     public String login(String username, String password) throws AuthenticationException {
@@ -32,7 +36,7 @@ public class UserServiceImpl implements UserService{
         String token;
         try {
             token = authenticationHandler.authenticate(user);
-        } catch (InvalidUserException e) {
+        } catch (com.mapps.authentificationhandler.exceptions.InvalidUserException e) {
             logger.error("Username or password not valid");
             throw new AuthenticationException();
         }
@@ -41,11 +45,28 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public String logout(String token) {
-        return null;
+        return "";
     }
 
     @Override
-    public void updateUser(User user, String token) throws CouldNotUpdateUserException {
-
+    public void updateUser(User user, String token) throws InvalidUserException, AuthenticationException {
+        if (user == null){
+            logger.error("Not valid user to update");
+            throw new InvalidUserException();
+        }
+        try{
+            User actualUser = authenticationHandler.getUserOfToken(token);
+            if (actualUser.equals(user) || actualUser.getUserName() != user.getUserName()){
+                logger.error("The user that you want to update is the same");
+                throw new InvalidUserException();
+            }
+            userDAO.updateUser(user);
+        } catch (InvalidTokenException e) {
+            logger.error("Invalid token");
+            throw new AuthenticationException();
+        }catch (UserNotFoundException e){
+            logger.error("User not found");
+            throw new InvalidUserException();
+        }
     }
 }
