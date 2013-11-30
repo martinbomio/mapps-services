@@ -4,9 +4,11 @@ import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import com.mapps.authentificationhandler.AuthenticationHandler;
 import com.mapps.authentificationhandler.exceptions.InvalidTokenException;
+import com.mapps.exceptions.DeviceAlreadyExistException;
 import com.mapps.exceptions.DeviceNotFoundException;
 import com.mapps.exceptions.UserNotFoundException;
 import com.mapps.model.Device;
@@ -16,6 +18,7 @@ import com.mapps.persistence.DeviceDAO;
 import com.mapps.persistence.TrainingDAO;
 import com.mapps.persistence.UserDAO;
 import com.mapps.services.admin.exceptions.AuthenticationException;
+import com.mapps.services.admin.exceptions.DeviceAlreadyExistsException;
 import com.mapps.services.admin.exceptions.InvalidDeviceException;
 import com.mapps.services.admin.exceptions.InvalidDeviceRuntimeException;
 import com.mapps.services.admin.exceptions.InvalidUserException;
@@ -244,6 +247,10 @@ public class AdminServiceImplTest {
             Assert.fail();
         } catch (AuthenticationException e) {
             Assert.fail();
+        } catch (DeviceAlreadyExistException e) {
+            Assert.fail();
+        } catch (DeviceAlreadyExistsException e) {
+            Assert.fail();
         }
     }
 
@@ -255,6 +262,26 @@ public class AdminServiceImplTest {
         } catch (InvalidDeviceException e) {
             Assert.assertTrue(true);
         } catch (AuthenticationException e) {
+            Assert.fail();
+        } catch (DeviceAlreadyExistsException e) {
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void testAddDeviceAlreadyExists(){
+        Device device = mock(Device.class);
+        try {
+            Mockito.doThrow(new DeviceAlreadyExistException()).when(dDao).addDevice(device);
+            adminService.addDevice(device, "validToken");
+            Assert.fail();
+        } catch (InvalidDeviceException e) {
+            Assert.assertTrue(true);
+        } catch (AuthenticationException e) {
+            Assert.fail();
+        } catch (DeviceAlreadyExistsException e) {
+            Assert.assertTrue(true);
+        } catch (DeviceAlreadyExistException e) {
             Assert.fail();
         }
     }
@@ -269,6 +296,8 @@ public class AdminServiceImplTest {
             Assert.fail();
         } catch (AuthenticationException e) {
             Assert.assertTrue(true);
+        } catch (DeviceAlreadyExistsException e) {
+            Assert.fail();
         }
     }
 
@@ -282,6 +311,8 @@ public class AdminServiceImplTest {
             Assert.fail();
         } catch (AuthenticationException e) {
             Assert.assertTrue(true);
+        } catch (DeviceAlreadyExistsException e) {
+            Assert.fail();
         }
     }
 

@@ -8,6 +8,7 @@ import com.mapps.model.Role;
 import com.mapps.model.Training;
 import com.mapps.model.User;
 import com.mapps.services.admin.exceptions.AuthenticationException;
+import com.mapps.services.admin.exceptions.DeviceAlreadyExistsException;
 import com.mapps.services.admin.exceptions.InvalidDeviceException;
 import com.mapps.services.admin.exceptions.InvalidUserException;
 
@@ -58,8 +59,10 @@ public interface AdminService{
      * @param token the identifier of the session.
      * @throws InvalidDeviceException when the device to add is not a valid one.
      * @throws AuthenticationException when the caller has not ADMIN privileges.
+     * @throws DeviceAlreadyExistsException thrown when the device is already on the database.
      */
-    void addDevice(Device device, String token)throws InvalidDeviceException, AuthenticationException;
+    void addDevice(Device device, String token)throws InvalidDeviceException, AuthenticationException,
+                                                        DeviceAlreadyExistsException;
 
     /**
      * Disable a device from the System. This happens when the device is broken.

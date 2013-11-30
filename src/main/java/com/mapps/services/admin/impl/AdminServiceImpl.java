@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 
 import com.mapps.authentificationhandler.AuthenticationHandler;
 import com.mapps.authentificationhandler.exceptions.InvalidTokenException;
+import com.mapps.exceptions.DeviceAlreadyExistException;
 import com.mapps.exceptions.DeviceNotFoundException;
 import com.mapps.exceptions.UserNotFoundException;
 import com.mapps.model.Device;
@@ -19,6 +20,7 @@ import com.mapps.persistence.TrainingDAO;
 import com.mapps.persistence.UserDAO;
 import com.mapps.services.admin.AdminService;
 import com.mapps.services.admin.exceptions.AuthenticationException;
+import com.mapps.services.admin.exceptions.DeviceAlreadyExistsException;
 import com.mapps.services.admin.exceptions.InvalidDeviceException;
 import com.mapps.services.admin.exceptions.InvalidDeviceRuntimeException;
 import com.mapps.services.admin.exceptions.InvalidUserException;
@@ -112,7 +114,8 @@ public class AdminServiceImpl implements AdminService{
     }
 
     @Override
-    public void addDevice(Device device, String token) throws InvalidDeviceException, AuthenticationException{
+    public void addDevice(Device device, String token) throws InvalidDeviceException, AuthenticationException,
+                                                                DeviceAlreadyExistsException {
         if( device == null ){
             logger.error("Invalid device");
             throw new InvalidDeviceException();
@@ -126,6 +129,9 @@ public class AdminServiceImpl implements AdminService{
         } catch (InvalidTokenException e) {
             logger.error("Invalid token");
             throw new AuthenticationException();
+        } catch (DeviceAlreadyExistException e) {
+            logger.error("Device already exists");
+            throw new DeviceAlreadyExistsException();
         }
     }
 
