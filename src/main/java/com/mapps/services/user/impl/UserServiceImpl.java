@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import com.mapps.authentificationhandler.AuthenticationHandler;
 import com.mapps.authentificationhandler.exceptions.InvalidTokenException;
 import com.mapps.exceptions.UserNotFoundException;
+import com.mapps.model.Role;
 import com.mapps.model.User;
 import com.mapps.persistence.UserDAO;
 import com.mapps.services.user.UserService;
@@ -22,9 +23,9 @@ public class UserServiceImpl implements UserService{
     Logger logger = Logger.getLogger(UserServiceImpl.class);
 
     @EJB(beanName = "AuthenticationHandler")
-    AuthenticationHandler authenticationHandler;
+    protected AuthenticationHandler authenticationHandler;
     @EJB(beanName = "UserDAO")
-    UserDAO userDAO;
+    protected UserDAO userDAO;
 
     @Override
     public String login(String username, String password) throws AuthenticationException {
@@ -56,11 +57,21 @@ public class UserServiceImpl implements UserService{
         }
         try{
             User actualUser = authenticationHandler.getUserOfToken(token);
-            if (actualUser.equals(user) || actualUser.getUserName() != user.getUserName()){
-                logger.error("The user that you want to update is the same");
-                throw new InvalidUserException();
+            if (actualUser.getRole() == Role.USER){
+                if (actualUser.equals(user)){
+                    logger.error("The user that you want to update is the same");
+                    throw new InvalidUserException();
+                }
+                if (actualUser.getUserName() != user.getUserName()){
+                    logger.error("Cannot change username");
+                    throw new InvalidUserException();
+                }
+                userDAO.updateUser(user);
+            }else if(actualUser.getRole() == Role.ADMINISTRATOR){
+                userDAO.updateUser(user);
+            }else {
+                throw new AuthenticationException();
             }
-            userDAO.updateUser(user);
         } catch (InvalidTokenException e) {
             logger.error("Invalid token");
             throw new AuthenticationException();
