@@ -1,5 +1,6 @@
 package com.mapps.services.admin.impl;
 
+import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
@@ -9,6 +10,7 @@ import com.mapps.authentificationhandler.AuthenticationHandler;
 import com.mapps.authentificationhandler.exceptions.InvalidTokenException;
 import com.mapps.exceptions.DeviceAlreadyExistException;
 import com.mapps.exceptions.DeviceNotFoundException;
+import com.mapps.exceptions.TrainingNotFoundException;
 import com.mapps.exceptions.UserNotFoundException;
 import com.mapps.model.Device;
 import com.mapps.model.Permission;
@@ -23,6 +25,7 @@ import com.mapps.services.admin.exceptions.AuthenticationException;
 import com.mapps.services.admin.exceptions.DeviceAlreadyExistsException;
 import com.mapps.services.admin.exceptions.InvalidDeviceException;
 import com.mapps.services.admin.exceptions.InvalidDeviceRuntimeException;
+import com.mapps.services.admin.exceptions.InvalidTrainingRuntimeException;
 import com.mapps.services.admin.exceptions.InvalidUserException;
 import com.mapps.services.admin.exceptions.InvalidUserRuntimeException;
 
@@ -87,7 +90,29 @@ public class AdminServiceImpl implements AdminService{
 
     @Override
     public void changePermissions(Training training, User user, Permission permission, String token) throws AuthenticationException {
-    //TODO: implement changePermissions.
+        if( user == null || training == null || permission == null || user.getUserName() == null){
+            logger.info("Some of the parameters are not valid");
+            throw new IllegalArgumentException();
+        }
+        try{
+            if (!authenticationHandler.isUserInRole(token,Role.ADMINISTRATOR)){
+                logger.error("User not an administrator");
+                throw new AuthenticationException();
+            }
+            Training dbTraining = trainingDAO.getTrainingByName(training);
+            User dbUser = userDAO.getUserByUsername(user.getUserName());
+            Map<User,Permission> permissionsForUsers = dbTraining.getMapUserPermission();
+            permissionsForUsers.put(dbUser,permission);
+        } catch (InvalidTokenException e) {
+            logger.error("Invalid token");
+            throw new AuthenticationException();
+        } catch (TrainingNotFoundException e) {
+            logger.info("Invalid training");
+            throw new InvalidTrainingRuntimeException();
+        } catch (UserNotFoundException e) {
+            logger.info("Invalid user");
+            throw new InvalidUserRuntimeException();
+        }
     }
 
     @Override
