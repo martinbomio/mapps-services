@@ -2,42 +2,65 @@ package com.mapps.services.institution.impl;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+
+import com.mapps.authentificationhandler.AuthenticationHandler;
+import com.mapps.authentificationhandler.exceptions.InvalidTokenException;
+import com.mapps.exceptions.InstitutionAlreadyExistException;
+import com.mapps.exceptions.NullParameterException;
 import com.mapps.model.Institution;
+import com.mapps.model.Role;
 import com.mapps.persistence.InstitutionDAO;
 import com.mapps.services.institution.InstitutionService;
 import com.mapps.services.institution.exceptions.AuthenticationException;
 import com.mapps.services.institution.exceptions.InvalidInstitutionException;
 import org.apache.log4j.Logger;
 
-
-
 /**
- * Created with IntelliJ IDEA.
- * User: Usuario1
- * Date: 29/11/13
- * Time: 05:14 PM
- * To change this template use File | Settings | File Templates.
+ *
  */
-
 @Stateless(name="InstitutionService")
 public class InstitutionServiceImpl implements InstitutionService {
     Logger logger = Logger.getLogger(InstitutionServiceImpl.class);
 
     @EJB(name = "InstitutionDAO")
-    private InstitutionDAO institutionDAO;
+    protected InstitutionDAO institutionDAO;
+    @EJB(beanName = "AuthenticationHandler")
+    protected AuthenticationHandler authenticationHandler;
+
 
     @Override
     public void createInstitution(Institution institution, String token) throws AuthenticationException, InvalidInstitutionException {
+        if(institution==null||institution.getName()==null||institution.getCountry()==null){
+            logger.error("invalid institution");
+            throw new InvalidInstitutionException();
+        }
+        try {
+            if(!(authenticationHandler.isUserInRole(token, Role.ADMINISTRATOR))||
+                    !(authenticationHandler.isUserInRole(token, Role.TRAINER))){
+                logger.error("authentication error");
+                throw new AuthenticationException();
+            }
+            institutionDAO.addInstitution(institution);
 
+        } catch (InvalidTokenException e) {
+            logger.error("Invalid Token");
+            throw new AuthenticationException();
+        }catch (InstitutionAlreadyExistException e2){
+            logger.error("institution already exist");
+            throw new InvalidInstitutionException();
+        } catch (NullParameterException e3) {
+            logger.error("invalid institution");
+            throw new InvalidInstitutionException();
+        }
     }
 
     @Override
-    public void deleteInstitution(Institution institution, String token) {
+    public void deleteInstitution(Institution institution, String token) throws AuthenticationException, InvalidInstitutionException{
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void updateInstitution(Institution institution, String token) {
+    public void updateInstitution(Institution institution, String token) throws AuthenticationException, InvalidInstitutionException{
         //To change body of implemented methods use File | Settings | File Templates.
     }
 }
