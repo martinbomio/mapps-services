@@ -10,6 +10,7 @@ import com.mapps.authentificationhandler.AuthenticationHandler;
 import com.mapps.authentificationhandler.exceptions.InvalidTokenException;
 import com.mapps.exceptions.DeviceAlreadyExistException;
 import com.mapps.exceptions.DeviceNotFoundException;
+import com.mapps.exceptions.NullParameterException;
 import com.mapps.exceptions.UserNotFoundException;
 import com.mapps.model.Device;
 import com.mapps.model.Role;
@@ -23,6 +24,7 @@ import com.mapps.services.admin.exceptions.InvalidDeviceException;
 import com.mapps.services.admin.exceptions.InvalidDeviceRuntimeException;
 import com.mapps.services.admin.exceptions.InvalidUserException;
 import com.mapps.services.admin.exceptions.InvalidUserRuntimeException;
+import com.mapps.services.admin.exceptions.UserAlreadyExistsException;
 import com.mapps.services.admin.stub.AdminServiceStub;
 
 import static org.mockito.Mockito.mock;
@@ -68,6 +70,8 @@ public class AdminServiceImplTest {
             Assert.fail();
         } catch (InvalidUserException e) {
             Assert.fail();
+        } catch (UserAlreadyExistsException e) {
+            Assert.fail();
         }
     }
 
@@ -83,6 +87,8 @@ public class AdminServiceImplTest {
             Assert.assertTrue(true);
         } catch (InvalidUserException e) {
             Assert.fail();
+        } catch (UserAlreadyExistsException e) {
+            Assert.fail();
         }
     }
 
@@ -97,6 +103,8 @@ public class AdminServiceImplTest {
             Assert.fail();
         } catch (InvalidUserException e) {
             Assert.assertTrue(true);
+        } catch (UserAlreadyExistsException e) {
+            Assert.fail();
         }
     }
 
@@ -109,6 +117,8 @@ public class AdminServiceImplTest {
             Assert.fail();
         } catch (InvalidUserException e) {
             Assert.assertTrue(true);
+        } catch (UserAlreadyExistsException e) {
+            Assert.fail();
         }
     }
 
@@ -123,6 +133,8 @@ public class AdminServiceImplTest {
         } catch (AuthenticationException e) {
             Assert.fail();
         } catch (UserNotFoundException e) {
+            Assert.fail();
+        } catch (NullParameterException e) {
             Assert.fail();
         }
 
@@ -189,6 +201,8 @@ public class AdminServiceImplTest {
             Assert.fail();
         } catch (UserNotFoundException e) {
             Assert.fail();
+        } catch (NullParameterException e) {
+            Assert.fail();
         }
     }
 
@@ -251,6 +265,8 @@ public class AdminServiceImplTest {
             Assert.fail();
         } catch (DeviceAlreadyExistsException e) {
             Assert.fail();
+        } catch (NullParameterException e) {
+            Assert.fail();
         }
     }
 
@@ -282,6 +298,8 @@ public class AdminServiceImplTest {
         } catch (DeviceAlreadyExistsException e) {
             Assert.assertTrue(true);
         } catch (DeviceAlreadyExistException e) {
+            Assert.fail();
+        } catch (NullParameterException e) {
             Assert.fail();
         }
     }
@@ -319,14 +337,16 @@ public class AdminServiceImplTest {
     @Test
     public void testDisableDevice(){
         Device device = mock(Device.class);
-        when(device.getDirLow()).thenReturn(123L);
+        when(device.getDirLow()).thenReturn("123L");
         try {
-            when(dDao.getDeviceByDir(123L)).thenReturn(device);
+            when(dDao.getDeviceByDir("123L")).thenReturn(device);
             adminService.disableDevice(device,"validToken");
             verify(dDao).updateDevice(device);
         } catch (AuthenticationException e) {
             Assert.fail();
         } catch (DeviceNotFoundException e) {
+            Assert.fail();
+        } catch (NullParameterException e) {
             Assert.fail();
         }
     }
@@ -334,9 +354,9 @@ public class AdminServiceImplTest {
     @Test
     public void testDisableDeviceWithoutPermissions(){
         Device device = mock(Device.class);
-        when(device.getDirLow()).thenReturn(123L);
+        when(device.getDirLow()).thenReturn("123L");
         try {
-            when(dDao.getDeviceByDir(123L)).thenReturn(device);
+            when(dDao.getDeviceByDir("123L")).thenReturn(device);
             adminService.disableDevice(device,"invalidToken");
             Assert.fail();
         } catch (AuthenticationException e) {
@@ -349,9 +369,9 @@ public class AdminServiceImplTest {
     @Test
     public void testDisableDeviceInvalidToken(){
         Device device = mock(Device.class);
-        when(device.getDirLow()).thenReturn(123L);
+        when(device.getDirLow()).thenReturn("123L");
         try {
-            when(dDao.getDeviceByDir(123L)).thenReturn(device);
+            when(dDao.getDeviceByDir("123L")).thenReturn(device);
             adminService.disableDevice(device,"");
             Assert.fail();
         } catch (AuthenticationException e) {
@@ -364,9 +384,9 @@ public class AdminServiceImplTest {
     @Test(expected = InvalidDeviceRuntimeException.class)
     public void testDisableInvalidDevice(){
         Device device = mock(Device.class);
-        when(device.getDirLow()).thenReturn(123L);
+        when(device.getDirLow()).thenReturn("123L");
         try {
-            when(dDao.getDeviceByDir(123L)).thenThrow(new DeviceNotFoundException());
+            when(dDao.getDeviceByDir("123L")).thenThrow(new DeviceNotFoundException());
             adminService.disableDevice(device,"validToken");
             Assert.fail();
         } catch (AuthenticationException e) {

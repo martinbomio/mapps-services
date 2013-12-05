@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 
 import com.mapps.authentificationhandler.AuthenticationHandler;
 import com.mapps.authentificationhandler.exceptions.InvalidTokenException;
+import com.mapps.exceptions.NullParameterException;
 import com.mapps.exceptions.UserNotFoundException;
 import com.mapps.model.Role;
 import com.mapps.model.User;
@@ -77,6 +78,9 @@ public class UserServiceImpl implements UserService{
             throw new AuthenticationException();
         }catch (UserNotFoundException e){
             logger.error("User not found");
+            throw new InvalidUserException();
+        } catch (NullParameterException e) {
+            logger.error("Not valid user to update");
             throw new InvalidUserException();
         }
     }

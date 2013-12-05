@@ -53,7 +53,7 @@ public class ReceiveRestfulService implements ReceiverService{
             if(trainingDAO.isTrainingStarted(dbTraining.getName()))
                 handleData(sensorData, device, dbTraining);
             else
-                logger.info("Training: "+dbTraining.getName()+" no started yet.")
+                logger.info("Training: "+dbTraining.getName()+" no started yet.");
         } catch (InvalidDeviceException e) {
             throw new InvalidDataRuntimeException();
         } catch (InvalidDataException e) {

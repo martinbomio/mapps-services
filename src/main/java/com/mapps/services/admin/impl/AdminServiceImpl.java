@@ -10,7 +10,9 @@ import com.mapps.authentificationhandler.AuthenticationHandler;
 import com.mapps.authentificationhandler.exceptions.InvalidTokenException;
 import com.mapps.exceptions.DeviceAlreadyExistException;
 import com.mapps.exceptions.DeviceNotFoundException;
+import com.mapps.exceptions.NullParameterException;
 import com.mapps.exceptions.TrainingNotFoundException;
+import com.mapps.exceptions.UserAlreadyExistException;
 import com.mapps.exceptions.UserNotFoundException;
 import com.mapps.model.Device;
 import com.mapps.model.Permission;
@@ -28,6 +30,7 @@ import com.mapps.services.admin.exceptions.InvalidDeviceRuntimeException;
 import com.mapps.services.admin.exceptions.InvalidTrainingRuntimeException;
 import com.mapps.services.admin.exceptions.InvalidUserException;
 import com.mapps.services.admin.exceptions.InvalidUserRuntimeException;
+import com.mapps.services.admin.exceptions.UserAlreadyExistsException;
 
 /**
  * Implementation of AdminService
@@ -47,7 +50,7 @@ public class AdminServiceImpl implements AdminService{
     protected AuthenticationHandler authenticationHandler;
 
     @Override
-    public void createUser(User newUser, String token) throws AuthenticationException, InvalidUserException {
+    public void createUser(User newUser, String token) throws AuthenticationException, InvalidUserException, UserAlreadyExistsException {
         if (newUser == null || newUser.getUserName() == null || newUser.getPassword() == null){
             logger.error("Invalid User");
             throw new InvalidUserException();
@@ -62,6 +65,12 @@ public class AdminServiceImpl implements AdminService{
         } catch (InvalidTokenException e) {
             logger.error("Invalid Token");
             throw new AuthenticationException();
+        } catch (UserAlreadyExistException e) {
+            logger.error("User Already exists");
+            throw new UserAlreadyExistsException();
+        } catch (NullParameterException e) {
+            logger.error("Invalid User");
+            throw new InvalidUserException();
         }
     }
 
@@ -85,6 +94,9 @@ public class AdminServiceImpl implements AdminService{
         } catch (UserNotFoundException e) {
             logger.error("Invalid User");
             throw new InvalidUserRuntimeException();
+        } catch (NullParameterException e) {
+            logger.error("Invalid User");
+            throw new InvalidUserRuntimeException();
         }
     }
 
@@ -99,7 +111,7 @@ public class AdminServiceImpl implements AdminService{
                 logger.error("User not an administrator");
                 throw new AuthenticationException();
             }
-            Training dbTraining = trainingDAO.getTrainingByName(training);
+            Training dbTraining = trainingDAO.getTrainingByName(training.getName());
             User dbUser = userDAO.getUserByUsername(user.getUserName());
             Map<User,Permission> permissionsForUsers = dbTraining.getMapUserPermission();
             permissionsForUsers.put(dbUser,permission);
@@ -135,6 +147,9 @@ public class AdminServiceImpl implements AdminService{
         } catch (InvalidTokenException e) {
             logger.error("Invalid token");
             throw  new AuthenticationException();
+        } catch (NullParameterException e) {
+            logger.error("Invalid User");
+            throw new InvalidUserRuntimeException();
         }
     }
 
@@ -157,6 +172,9 @@ public class AdminServiceImpl implements AdminService{
         } catch (DeviceAlreadyExistException e) {
             logger.error("Device already exists");
             throw new DeviceAlreadyExistsException();
+        } catch (NullParameterException e) {
+            logger.error("Invalid device");
+            throw new InvalidDeviceException();
         }
     }
 
@@ -179,6 +197,9 @@ public class AdminServiceImpl implements AdminService{
             throw new AuthenticationException();
         } catch (DeviceNotFoundException e) {
             logger.error("Invalid device");
+            throw new InvalidDeviceRuntimeException();
+        } catch (NullParameterException e) {
+            logger.info("Invalid device");
             throw new InvalidDeviceRuntimeException();
         }
     }

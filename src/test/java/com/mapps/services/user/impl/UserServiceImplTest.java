@@ -8,6 +8,7 @@ import org.junit.Test;
 import com.mapps.authentificationhandler.AuthenticationHandler;
 import com.mapps.authentificationhandler.exceptions.InvalidTokenException;
 import com.mapps.authentificationhandler.exceptions.InvalidUserException;
+import com.mapps.exceptions.NullParameterException;
 import com.mapps.exceptions.UserNotFoundException;
 import com.mapps.model.Role;
 import com.mapps.model.User;
@@ -112,6 +113,8 @@ public class UserServiceImplTest {
         } catch (UserNotFoundException e) {
             Assert.fail();
         } catch (InvalidTokenException e) {
+            Assert.fail();
+        } catch (NullParameterException e) {
             Assert.fail();
         }
     }

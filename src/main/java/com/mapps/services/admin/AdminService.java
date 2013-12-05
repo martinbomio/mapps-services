@@ -11,6 +11,7 @@ import com.mapps.services.admin.exceptions.AuthenticationException;
 import com.mapps.services.admin.exceptions.DeviceAlreadyExistsException;
 import com.mapps.services.admin.exceptions.InvalidDeviceException;
 import com.mapps.services.admin.exceptions.InvalidUserException;
+import com.mapps.services.admin.exceptions.UserAlreadyExistsException;
 
 /**
  * Defines the operation of the Administrator with the system.
@@ -24,7 +25,7 @@ public interface AdminService{
      * @throws AuthenticationException when the caller has not ADMIN permissions
      * @throws InvalidUserException when the user to add is not valid.
      */
-    void createUser(User newUser, String token) throws AuthenticationException, InvalidUserException;
+    void createUser(User newUser, String token) throws AuthenticationException, InvalidUserException, UserAlreadyExistsException;
 
     /**
      * Deletes a user from the system.
