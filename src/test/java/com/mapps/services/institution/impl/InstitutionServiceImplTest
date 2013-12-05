@@ -53,5 +53,53 @@ public class InstitutionServiceImplTest {
         }
 
     }
+    @Test
+    public void testCreateInvalidInstitution(){
+        Institution validInstitution=mock(Institution.class);
+        when(validInstitution.getName()).thenReturn("nombreInstitucion");
+
+        try {
+            institutionService.createInstitution(validInstitution,"validToken");
+            Assert.fail();
+        } catch (AuthenticationException e) {
+            Assert.fail();
+        } catch (InvalidInstitutionException e) {
+            Assert.assertTrue(true);
+        }
+    }
+    @Test
+    public void testCreateInstitutionWithoutPermissions(){
+        Institution validInstitution=mock(Institution.class);
+        when(validInstitution.getName()).thenReturn("nombreInstitucion");
+        when(validInstitution.getCountry()).thenReturn("paisInstitucion");
+
+        try {
+            institutionService.createInstitution(validInstitution,"invalidToken");
+            Assert.fail();
+        } catch (AuthenticationException e) {
+            Assert.assertTrue(true);
+        } catch (InvalidInstitutionException e) {
+            Assert.fail();
+        }
+    }
+    @Test
+    public void testCreateNullInstitution(){
+        try {
+            institutionService.createInstitution(null, "validToken");
+            Assert.fail();
+        } catch (AuthenticationException e) {
+            Assert.fail();
+        } catch (InvalidInstitutionException e) {
+            Assert.assertTrue(true);
+        }
+    }
+    @Test
+    public void testDeleteInstitution(){
+        Institution deleteInstitution=mock(Institution.class);
+        when(deleteInstitution.getName()).thenReturn("borrarInstitucion");
+        when(deleteInstitution.getCountry()).thenReturn("paisInstitucion");
+
+
+    }
 
 }

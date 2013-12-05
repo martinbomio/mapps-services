@@ -6,6 +6,7 @@ import javax.ejb.Stateless;
 import com.mapps.authentificationhandler.AuthenticationHandler;
 import com.mapps.authentificationhandler.exceptions.InvalidTokenException;
 import com.mapps.exceptions.InstitutionAlreadyExistException;
+import com.mapps.exceptions.InstitutionNotFoundException;
 import com.mapps.exceptions.NullParameterException;
 import com.mapps.model.Institution;
 import com.mapps.model.Role;
@@ -56,11 +57,55 @@ public class InstitutionServiceImpl implements InstitutionService {
 
     @Override
     public void deleteInstitution(Institution institution, String token) throws AuthenticationException, InvalidInstitutionException{
-        //To change body of implemented methods use File | Settings | File Templates.
+        if(institution==null||institution.getName()==null||institution.getCountry()==null){
+            logger.error("invalid institution");
+            throw new InvalidInstitutionException();
+        }
+        try{
+        if(!(authenticationHandler.isUserInRole(token, Role.ADMINISTRATOR))){
+            logger.error("authentication error");
+            throw new AuthenticationException();
+        }
+        Institution instAux=institutionDAO.getInstitutionByName(institution.getName());
+        instAux.setEnabled(false);
+        institutionDAO.updateInstitution(instAux);
+
+        }catch (InvalidTokenException e) {
+            logger.error("Invalid Token");
+            throw new AuthenticationException();
+
+        }catch (NullParameterException e) {
+            logger.error("null institution");
+            throw new InvalidInstitutionException();
+
+        } catch (InstitutionNotFoundException e) {
+            logger.error("institution not found in database");
+            throw new InvalidInstitutionException();
+        }
     }
 
     @Override
     public void updateInstitution(Institution institution, String token) throws AuthenticationException, InvalidInstitutionException{
-        //To change body of implemented methods use File | Settings | File Templates.
+        if(institution==null||institution.getName()==null||institution.getCountry()==null){
+            logger.error("invalid institution");
+            throw new InvalidInstitutionException();
+        }
+        try{
+        if(!(authenticationHandler.isUserInRole(token, Role.ADMINISTRATOR))){
+            logger.error("authentication error");
+            throw new AuthenticationException();
+        }
+        institutionDAO.updateInstitution(institution);
+
+        } catch (InvalidTokenException e) {
+            logger.error("Invalid Token");
+            throw new AuthenticationException();
+        } catch (NullParameterException e) {
+            logger.error("null institution");
+            throw new InvalidInstitutionException();
+        } catch (InstitutionNotFoundException e) {
+            logger.error("institution not found in database");
+            throw new InvalidInstitutionException();
+        }
     }
 }
